@@ -1,8 +1,10 @@
 extern crate image;
 extern crate rand;
+extern crate rayon;
 
 use image::*;
 use rand::*;
+use rayon::prelude::*;
 use std::env;
 
 const MAX_WIDTH: u32 = 1024;
@@ -10,12 +12,13 @@ const MAX_HEIGHT: u32 = 1024;
 
 
 fn main() {
-    let mut rng = weak_rng();
     let count = env::args().nth(1).and_then(|s| s.parse().ok()).unwrap_or(1);
 
     println!("Generating {} random images", count);
 
-    for i in 0..count {
+    (0..count).into_par_iter().for_each(|i| {
+        let mut rng = rand::thread_rng();
+
         let filename = gen_filename(&mut rng, ".jpg");
         println!("  [{}/{}] {}", i + 1, count, filename);
 
@@ -24,10 +27,10 @@ fn main() {
         if let Err(e) = buf.save(filename) {
             println!("error: {}", e);
         }
-    }
+    });
 }
 
-fn gen_filename(rng: &mut XorShiftRng, extension: &str) -> String {
+fn gen_filename<R: Rng>(rng: &mut R, extension: &str) -> String {
     let length = rng.gen_range(4, 128);
     let mut name = String::with_capacity(length + extension.len());
 
@@ -40,7 +43,7 @@ fn gen_filename(rng: &mut XorShiftRng, extension: &str) -> String {
     name
 }
 
-fn gen_image(rng: &mut XorShiftRng) -> ImageBuffer<Rgb<u8>, Vec<u8>>  {
+fn gen_image<R: Rng>(rng: &mut R) -> ImageBuffer<Rgb<u8>, Vec<u8>>  {
     let width = rng.gen_range(32, MAX_WIDTH);
     let height = rng.gen_range(32, MAX_HEIGHT);
 

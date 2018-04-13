@@ -4,9 +4,10 @@ version = "0.1.0"
 authors = ["Stephen M. Coakley <me@stephencoakley.com>"]
 
 [dependencies]
-rand = "0.3.15"
+rand = "0.4"
+rayon = "1.0"
 
 [dependencies.image]
-version = "0.14"
+version = "0.18"
 default-features = false
 features = ["jpeg"]
