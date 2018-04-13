@@ -1,30 +1,47 @@
 extern crate image;
 extern crate rand;
 extern crate rayon;
+#[macro_use]
+extern crate structopt;
 
 use image::*;
 use rand::*;
 use rayon::prelude::*;
-use std::env;
+use std::path::PathBuf;
+use structopt::StructOpt;
 
-const MAX_WIDTH: u32 = 1024;
-const MAX_HEIGHT: u32 = 1024;
+#[derive(StructOpt, Debug)]
+struct Options {
+    #[structopt(short = "o", long = "output-dir", default_value = ".", parse(from_os_str))]
+    output_directory: PathBuf,
 
+    #[structopt(long = "max-width", default_value = "1024")]
+    max_width: u32,
+
+    #[structopt(long = "max-height", default_value = "1024")]
+    max_height: u32,
+
+    #[structopt(name = "COUNT", default_value = "1")]
+    count: u32,
+}
 
 fn main() {
-    let count = env::args().nth(1).and_then(|s| s.parse().ok()).unwrap_or(1);
+    let options = Options::from_args();
+    let count = options.count;
 
     println!("Generating {} random images", count);
 
     (0..count).into_par_iter().for_each(|i| {
         let mut rng = rand::thread_rng();
+        let mut path = options.output_directory.clone();
 
         let filename = gen_filename(&mut rng, ".jpg");
         println!("  [{}/{}] {}", i + 1, count, filename);
+        path.push(filename);
 
-        let buf = gen_image(&mut rng);
+        let buf = gen_image(&mut rng, &options);
 
-        if let Err(e) = buf.save(filename) {
+        if let Err(e) = buf.save(path) {
             println!("error: {}", e);
         }
     });
@@ -43,9 +60,9 @@ fn gen_filename<R: Rng>(rng: &mut R, extension: &str) -> String {
     name
 }
 
-fn gen_image<R: Rng>(rng: &mut R) -> ImageBuffer<Rgb<u8>, Vec<u8>>  {
-    let width = rng.gen_range(32, MAX_WIDTH);
-    let height = rng.gen_range(32, MAX_HEIGHT);
+fn gen_image<R: Rng>(rng: &mut R, options: &Options) -> ImageBuffer<Rgb<u8>, Vec<u8>>  {
+    let width = rng.gen_range(32, options.max_width);
+    let height = rng.gen_range(32, options.max_height);
 
     let mut buf = image::ImageBuffer::new(width, height);
 

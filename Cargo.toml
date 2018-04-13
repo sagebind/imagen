@@ -6,6 +6,7 @@ authors = ["Stephen M. Coakley <me@stephencoakley.com>"]
 [dependencies]
 rand = "0.4"
 rayon = "1.0"
+structopt = "0.2"
 
 [dependencies.image]
 version = "0.18"
