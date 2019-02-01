@@ -9,6 +9,6 @@ rayon = "1.0"
 structopt = "0.2"
 
 [dependencies.image]
-version = "0.18"
+version = "0.21"
 default-features = false
 features = ["jpeg"]
