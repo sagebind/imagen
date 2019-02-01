@@ -4,7 +4,7 @@ version = "0.2.0"
 authors = ["Stephen M. Coakley <me@stephencoakley.com>"]
 
 [dependencies]
-rand = "0.4"
+rand = "0.6"
 rayon = "1.0"
 structopt = "0.2"
 
