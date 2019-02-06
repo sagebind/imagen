@@ -1,12 +1,8 @@
-extern crate image;
-extern crate rand;
-extern crate rayon;
-#[macro_use]
-extern crate structopt;
-
 use image::*;
-use rand::*;
+use rand::prelude::*;
+use rand::distributions::Alphanumeric;
 use rayon::prelude::*;
+use std::iter;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -47,11 +43,11 @@ fn main() {
     });
 }
 
-fn gen_filename<R: Rng>(rng: &mut R, extension: &str) -> String {
+fn gen_filename(mut rng: impl RngCore, extension: &str) -> String {
     let length = rng.gen_range(4, 128);
     let mut name = String::with_capacity(length + extension.len());
 
-    for c in rng.gen_ascii_chars().take(length) {
+    for c in iter::repeat(()).map(|_| rng.sample(Alphanumeric)).take(length) {
         name.push(c);
     }
 
@@ -60,7 +56,7 @@ fn gen_filename<R: Rng>(rng: &mut R, extension: &str) -> String {
     name
 }
 
-fn gen_image<R: Rng>(rng: &mut R, options: &Options) -> ImageBuffer<Rgb<u8>, Vec<u8>>  {
+fn gen_image(mut rng: impl RngCore, options: &Options) -> ImageBuffer<Rgb<u8>, Vec<u8>>  {
     let width = rng.gen_range(32, options.max_width);
     let height = rng.gen_range(32, options.max_height);
 
