@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 rand = "0.7"
 rayon = "1.1"
-structopt = "0.2"
+structopt = "0.3"
 
 [dependencies.image]
 version = "0.21"
